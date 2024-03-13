@@ -1,3 +1,5 @@
+#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+
 using Microsoft.EntityFrameworkCore;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
@@ -21,11 +23,10 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
 
 builder.Services.AddRazorPages();
 
-if (builder.Environment.IsDevelopment())
-#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-    builder.Services.AddApplicationInsightsTelemetry();
+if (builder.Environment.IsDevelopment())    
     await SeedData.Initialize(builder.Services.BuildServiceProvider());
-#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+else
+    builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
