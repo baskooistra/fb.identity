@@ -34,7 +34,7 @@ if (!builder.Environment.IsDevelopment())
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ??
                        throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
-connectionString = builder.Configuration.GetValue<string>("Identity:ConnectionStrings:IdentityContextConnection");
+
 builder.Services.AddDbContext<IdentityContext>(dbContextOptions =>
     dbContextOptions.UseSqlServer(connectionString, 
         sqlServerOptions =>
