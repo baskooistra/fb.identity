@@ -1,5 +1,7 @@
 #pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
 
+using Azure.Identity;
+using CommunityToolkit.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
@@ -12,8 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ??
                        throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
 
-builder.Services.AddDbContext<IdentityContext>(options =>
-    options.UseSqlServer(connectionString, options => options.MigrationsAssembly("Identity.API")));
+builder.Services.AddDbContext<IdentityContext>(dbContextOptions =>
+    dbContextOptions.UseSqlServer(connectionString, 
+        sqlServerOptions =>
+        {
+            sqlServerOptions.MigrationsAssembly("Identity.API");
+            sqlServerOptions.EnableRetryOnFailure();
+        }));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -26,7 +33,16 @@ builder.Services.AddRazorPages();
 if (builder.Environment.IsDevelopment())    
     await SeedData.Initialize(builder.Services.BuildServiceProvider());
 else
-    builder.Services.AddApplicationInsightsTelemetry();
+{
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        var endpoint = builder.Configuration.GetValue<string>("ConfigurationEndpoint");
+        Guard.IsNotNullOrWhiteSpace(endpoint);
+        options.Connect(new Uri(endpoint), new ManagedIdentityCredential());
+    });
+    
+    builder.Services.AddApplicationInsightsTelemetry();   
+}
 
 var app = builder.Build();
 
