@@ -18,7 +18,7 @@ if (!builder.Environment.IsDevelopment())
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
         var endpoint = builder.Configuration.GetValue<string>(AppConfigurationEndpoint);
-        var configurationKey = $"{AppConfigurationKey}:";
+        var configurationKey = builder.Configuration.GetValue<string>(AppConfigurationKey) + ":";
         var environmentName = builder.Environment.EnvironmentName;
 
         Guard.IsNotNullOrWhiteSpace(endpoint);
