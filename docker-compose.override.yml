@@ -14,7 +14,6 @@ services:
   identity.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_APPLICATIONNAME=Identity 
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__IdentityContextConnection=${IDENTITY_DB_CONNECTION_STRING:-Server=identity.sql;Database=IdentityDb;User Id=sa;Password=Id3ntity_2024;Encrypt=False;TrustServerCertificate=true}

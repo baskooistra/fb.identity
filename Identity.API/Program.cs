@@ -7,10 +7,9 @@ using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Identity.API.SeedData;
-using Azure.Core.Pipeline;
-using Azure.Data.AppConfiguration;
 
-const string AppConfigurationKey = "ConfigurationEndpoint";
+const string AppConfigurationEndpoint = "ConfigurationEndpoint";
+const string AppConfigurationKey = "ConfigurationKey";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +17,8 @@ if (!builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
-        var endpoint = builder.Configuration.GetValue<string>(AppConfigurationKey);
-        var configurationKey = $"{builder.Environment.ApplicationName}:";
+        var endpoint = builder.Configuration.GetValue<string>(AppConfigurationEndpoint);
+        var configurationKey = $"{AppConfigurationKey}:";
         var environmentName = builder.Environment.EnvironmentName;
 
         Guard.IsNotNullOrWhiteSpace(endpoint);
