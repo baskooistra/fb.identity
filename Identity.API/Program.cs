@@ -10,7 +10,7 @@ using Identity.API.SeedData;
 using Azure.Core.Pipeline;
 using Azure.Data.AppConfiguration;
 
-const string AppConfigurationKey = "AppConfiguration";
+const string AppConfigurationKey = "ConfigurationEndpoint";
 
 var builder = WebApplication.CreateBuilder(args);
 
