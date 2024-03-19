@@ -1,17 +1,12 @@
 #pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
 
-using Azure.Identity;
-using CommunityToolkit.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using Identity.Domain.Models;
-using Identity.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
+using Identity.API.Extensions;
 using Identity.API.SeedData;
 using Serilog;
-using Identity.API.Extensions;
+using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(Serilog.Events.LogEventLevel.Debug)
+    .WriteTo.Console(LogEventLevel.Debug)
     .MinimumLevel.Debug()
     .CreateBootstrapLogger();
 

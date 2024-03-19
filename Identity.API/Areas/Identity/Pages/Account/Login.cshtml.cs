@@ -3,11 +3,11 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
+using Identity.Domain.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Identity.Domain.Models;
 
 namespace Identity.API.Areas.Identity.Pages.Account
 {
