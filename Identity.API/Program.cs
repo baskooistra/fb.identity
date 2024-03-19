@@ -7,73 +7,45 @@ using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Identity.API.SeedData;
+using Serilog;
+using Identity.API.Extensions;
 
-const string AppConfigurationEndpoint = "ConfigurationEndpoint";
-const string AppConfigurationKey = "ConfigurationKey";
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(Serilog.Events.LogEventLevel.Debug)
+    .MinimumLevel.Debug()
+    .CreateBootstrapLogger();
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Information("Starting identity server...");
 
-if (!builder.Environment.IsDevelopment())
+try
 {
-    builder.Configuration.AddAzureAppConfiguration(options =>
-    {
-        var endpoint = builder.Configuration.GetValue<string>(AppConfigurationEndpoint);
-        var configurationKey = builder.Configuration.GetValue<string>(AppConfigurationKey) + ":";
-        var environmentName = builder.Environment.EnvironmentName;
+    var builder = WebApplication.CreateBuilder(args);
+    var development = builder.Environment.IsDevelopment();
 
-        Guard.IsNotNullOrWhiteSpace(endpoint);
-        var config = options.Connect(new Uri(endpoint), new ManagedIdentityCredential())
-            .Select($"{configurationKey}*", environmentName)
-            .TrimKeyPrefix(configurationKey);
-    });
+    if (!development)
+        builder.AddCloudHostedServices();
 
-    builder.Services.AddApplicationInsightsTelemetry();
+    builder
+        .AddLogging()
+        .AddDatabase()
+        .AddIdentity()
+        .AddAspNetEndpoints();
+
+    if (development)
+        await SeedData.Initialize(builder.Services.BuildServiceProvider());
+
+    var app = builder.Build();
+
+    app.ConfigurePipeline();
+
+    app.Run();
 }
-
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ??
-                       throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
-
-builder.Services.AddDbContext<IdentityContext>(dbContextOptions =>
-    dbContextOptions.UseSqlServer(connectionString, 
-        sqlServerOptions =>
-        {
-            sqlServerOptions.MigrationsAssembly("Identity.API");
-            sqlServerOptions.EnableRetryOnFailure();
-        }));
-
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<IdentityContext>();
-
-builder.Services.AddRazorPages();
-
-if (builder.Environment.IsDevelopment())    
-    await SeedData.Initialize(builder.Services.BuildServiceProvider());
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+catch (Exception exc)
 {
-    app.UseMigrationsEndPoint();
+    Log.Fatal(exc, "Unable to start identity server");
 }
-else
+finally
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    Log.Information("Identity server termimnated");
+    Log.CloseAndFlush();
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapRazorPages();
-
-app.Run();
