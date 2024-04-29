@@ -89,4 +89,27 @@ public static class ConfigurationExtensions
 
         return builder;
     }
+
+    public static WebApplicationBuilder AddIdentityServer(this WebApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ??
+                               throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
+
+        builder.Services.AddIdentityServer()
+            .AddConfigurationStore(options =>
+            {
+                options.ConfigureDbContext = config =>
+                    config.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(typeof(Program).Assembly.GetName().Name));
+            })
+            .AddOperationalStore(options =>
+            {
+                options.ConfigureDbContext = config =>
+                    config.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(typeof(Program).Assembly.GetName().Name));
+            })
+            .AddAspNetIdentity<User>();
+
+        return builder;
+    }
 }

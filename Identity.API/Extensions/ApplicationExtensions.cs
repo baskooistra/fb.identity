@@ -7,8 +7,8 @@ public static class ApplicationExtensions
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.UseMigrationsEndPoint();
             app.UseDeveloperExceptionPage();
+            app.UseMigrationsEndPoint();
         }
         else
         {
@@ -18,11 +18,9 @@ public static class ApplicationExtensions
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-
         app.UseRouting();
-
+        app.UseIdentityServer();
         app.UseAuthorization();
-
         app.MapRazorPages();
 
         return app;

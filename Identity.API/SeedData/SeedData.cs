@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
+using Duende.IdentityServer.Models;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;

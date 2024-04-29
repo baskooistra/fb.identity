@@ -1,0 +1,59 @@
+﻿@page
+@model AddClient
+
+@{
+    Layout = "Shared/_Layout";
+    ViewData["Title"] = "Add OIDC Client";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <div class="row">
+        <form id="client" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Enabled" class="form-control" />
+                <label asp-for="Input.Enabled" class="form-label">Enabled</label>
+                <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ClientId" class="form-control" autocomplete="clientId" aria-required="true" placeholder="client id" />
+                <label asp-for="Input.ClientId" class="form-label">Client Id</label>
+                <span asp-validation-for="Input.ClientId" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ClientSecret" class="form-control" autocomplete="clientSecret" aria-required="true" placeholder="client secret" />
+                <label asp-for="Input.ClientSecret" class="form-label" type="password">Client Secret</label>
+                <span asp-validation-for="Input.ClientSecret" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Type" class="form-control" autocomplete="type" aria-required="true" placeholder="client type" />
+                <label asp-for="Input.Type" class="form-label">Client type</label>
+                <span asp-validation-for="Input.Type" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ClientName" class="form-control" autocomplete="clientName" aria-required="true" placeholder="client name" />
+                <label asp-for="Input.ClientName" class="form-label">Client name</label>
+                <span asp-validation-for="Input.ClientName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Description" class="form-control" autocomplete="description" aria-required="true" placeholder="description" />
+                <label asp-for="Input.Description" class="form-label">Description</label>
+                <span asp-validation-for="Input.Description" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.RedirectUri" class="form-control" autocomplete="redirectUri" aria-required="true" placeholder="redirect uri" />
+                <label asp-for="Input.RedirectUri" class="form-label">Redirect uri</label>
+                <span asp-validation-for="Input.RedirectUri" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PostLogoutRedirectUri" class="form-control" autocomplete="postLogout" aria-required="true" placeholder="post logout uri" />
+                <label asp-for="Input.PostLogoutRedirectUri" class="form-label">Post logout redirect uri</label>
+                <span asp-validation-for="Input.PostLogoutRedirectUri" class="text-danger"></span>
+            </div>
+            <div>
+                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

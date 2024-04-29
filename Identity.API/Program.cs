@@ -2,6 +2,7 @@
 
 using Identity.API.Extensions;
 using Identity.API.SeedData;
+using Identity.Infrastructure;
 using Serilog;
 using Serilog.Events;
 
@@ -24,10 +25,16 @@ try
         .AddLogging()
         .AddDatabase()
         .AddIdentity()
+        .AddIdentityServer()
         .AddAspNetEndpoints();
 
+    builder.Services.AddInfrastructure();
+
     if (development)
-        await SeedData.Initialize(builder.Services.BuildServiceProvider());
+    {
+        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        await SeedData.Initialize(builder.Services.BuildServiceProvider());   
+    }
 
     var app = builder.Build();
 
