@@ -12,7 +12,7 @@ namespace Identity.API.SeedData
 {
     public static class SeedData
     {
-        public static async Task Initialize(IServiceProvider serviceProvider)
+        public static async Task Initialize(IServiceProvider serviceProvider, bool migrateDatabase = false)
         {
             var context = serviceProvider.GetService<IdentityContext>();
             var configurationContext = serviceProvider.GetService<ConfigurationDbContext>();
@@ -26,9 +26,12 @@ namespace Identity.API.SeedData
             Guard.IsNotNull(roleManager);
             Guard.IsNotNull(userManager);
 
-            await context.Database.MigrateAsync();
-            await configurationContext.Database.MigrateAsync();
-            await persistedGrantContext.Database.MigrateAsync();
+            if (migrateDatabase) 
+            {
+                await context.Database.MigrateAsync();
+                await configurationContext.Database.MigrateAsync();
+                await persistedGrantContext.Database.MigrateAsync();
+            }
 
             string[] roles = ["Owner", "User"];
 
