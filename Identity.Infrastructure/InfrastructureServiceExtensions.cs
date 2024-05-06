@@ -8,6 +8,7 @@ public static class InfrastructureServiceExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        return services.AddTransient<IOidcClientsService, OidcClientsRepository>();
+        return services.AddTransient<IOidcClientsService, OidcClientsRepository>()
+            .AddTransient<IOidcScopesService, OidcScopesRepository>();
     }
 }

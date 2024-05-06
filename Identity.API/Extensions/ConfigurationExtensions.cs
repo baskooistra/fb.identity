@@ -4,6 +4,7 @@ using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 
@@ -85,7 +86,10 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder AddAspNetEndpoints(this WebApplicationBuilder builder)
     {
-        builder.Services.AddRazorPages();
+        builder.Services.AddRazorPages(options =>
+        {
+            options.Conventions.AuthorizeAreaFolder("oidc", "/");
+        });
 
         return builder;
     }
@@ -109,6 +113,25 @@ public static class ConfigurationExtensions
                         sql => sql.MigrationsAssembly(typeof(Program).Assembly.GetName().Name));
             })
             .AddAspNetIdentity<User>();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
+    {
+        var allowedDomains = builder.Configuration.GetSection("AllowedDomains").Get<string[]>();
+        if (allowedDomains?.Length > 0)
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy
+                        .WithOrigins(allowedDomains!)
+                        .AllowCredentials()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
         return builder;
     }

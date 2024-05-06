@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
+using Duende.IdentityServer.EntityFramework.DbContexts;
+using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
@@ -8,19 +10,25 @@ using Serilog;
 
 namespace Identity.API.SeedData
 {
-    public class SeedData
+    public static class SeedData
     {
         public static async Task Initialize(IServiceProvider serviceProvider)
         {
             var context = serviceProvider.GetService<IdentityContext>();
+            var configurationContext = serviceProvider.GetService<ConfigurationDbContext>();
+            var persistedGrantContext = serviceProvider.GetService<PersistedGrantDbContext>();
             var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
             Guard.IsNotNull(context);
+            Guard.IsNotNull(configurationContext);
+            Guard.IsNotNull(persistedGrantContext);
             Guard.IsNotNull(roleManager);
             Guard.IsNotNull(userManager);
 
             await context.Database.MigrateAsync();
+            await configurationContext.Database.MigrateAsync();
+            await persistedGrantContext.Database.MigrateAsync();
 
             string[] roles = ["Owner", "User"];
 
@@ -32,7 +40,7 @@ namespace Identity.API.SeedData
                     var result = await roleManager.CreateAsync(new IdentityRole(roleName));
                     if (!result.Succeeded)
                     {
-                        HandleIdentityError(result);
+                        HandleIdentityError();
                         return;
                     }
                 }
@@ -58,7 +66,7 @@ namespace Identity.API.SeedData
                 var result = await userManager.CreateAsync(userData, "P@ssw0rd_2024");
                 if (!result.Succeeded)
                 {
-                    HandleIdentityError(result);
+                    HandleIdentityError();
                     return;
                 }
                     
@@ -67,13 +75,30 @@ namespace Identity.API.SeedData
                 
                 result = await userManager.AddToRolesAsync(user, roles);
                 if (!result.Succeeded)
-                    HandleIdentityError(result);
+                    HandleIdentityError();
+            }
+
+            if (!configurationContext.IdentityResources.Any())
+            {
+                Log.Debug("IdentityResources being populated");
+                foreach (var resource in IdentityResources)
+                {
+                    configurationContext.IdentityResources.Add(resource.ToEntity());
+                }
+                await configurationContext.SaveChangesAsync();
             }
         }
 
-        private static void HandleIdentityError(IdentityResult result)
+        private static IEnumerable<IdentityResource> IdentityResources =>
+        [
+            new IdentityResources.OpenId(),
+            new IdentityResources.Profile(),
+            new IdentityResources.Email()
+        ];
+
+        private static void HandleIdentityError()
         {
-            Log.Warning("An error occured while seeding default identity data, see the errors for details", result.Errors);
+            Log.Warning("An error occured while seeding default identity data, see the errors for details");
         }
     }
 }

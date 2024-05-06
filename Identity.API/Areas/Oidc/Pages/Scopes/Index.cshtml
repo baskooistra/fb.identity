@@ -1,0 +1,44 @@
+﻿@page
+@using System.Data;
+@model IndexModel
+
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Scopes overview";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <div class="row">
+        <a asp-area="oidc" asp-page="/Scopes/AddScope" class="btn btn-primary">
+            Add new scope
+        </a>
+    </div>
+    <form method="post">
+        <div class="row">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Display name</th>
+                        <th>Enabled</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow row in Model.ScopesTable.Rows)
+                    {
+                        <tr>
+                            <td>@row["Name"]</td>
+                            <td>@row["DisplayName"]</td>
+                            <td>@row["Enabled"]</td>
+                            <td>
+                                <button type="submit" asp-page-handler="delete" asp-route-name='@row["Name"]' class="btn btn-primary">Delete client</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>

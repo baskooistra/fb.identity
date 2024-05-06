@@ -19,6 +19,7 @@ public static class ApplicationExtensions
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseCors();
         app.UseIdentityServer();
         app.UseAuthorization();
         app.MapRazorPages();

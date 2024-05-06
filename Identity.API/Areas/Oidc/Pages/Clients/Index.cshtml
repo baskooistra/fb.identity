@@ -1,0 +1,47 @@
+﻿@page
+@using System.Data;
+@model IndexModel
+
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Clients overview";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <div class="row">
+        <a asp-area="oidc" asp-page="/Clients/AddClient" class="btn btn-primary">
+            Add new client
+        </a>
+    </div>
+    <form method="post">
+        <div class="row">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client ID</th>
+                        <th>Description</th>
+                        <th>Enabled</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow row in Model.ClientsTable.Rows)
+                    {
+                        <tr>
+                            <td>@row["ClientId"]</td>
+                            <td>@row["Description"]</td>
+                            <td>@row["Enabled"]</td>
+                            <td>
+                                <a asp-area="oidc" asp-page="/Scopes" asp-route-clientId='@row["ClientId"]' class="btn btn-primary">
+                                    Select scopes
+                                </a>
+                                <button type="submit" asp-page-handler="delete" asp-route-clientId='@row["ClientId"]' class="btn btn-primary">Delete client</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>

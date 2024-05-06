@@ -3,51 +3,32 @@
 using Identity.API.Extensions;
 using Identity.API.SeedData;
 using Identity.Infrastructure;
-using Serilog;
-using Serilog.Events;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(LogEventLevel.Debug)
-    .MinimumLevel.Debug()
-    .CreateBootstrapLogger();
+var builder = WebApplication.CreateBuilder(args);
+var development = builder.Environment.IsDevelopment();
 
-Log.Information("Starting identity server...");
+if (!development)
+    builder.AddCloudHostedServices();
 
-try
+builder
+    .AddLogging()
+    .AddDatabase()
+    .AddIdentity()
+    .AddIdentityServer()
+    .AddAspNetEndpoints()
+    .AddCors();
+
+builder.Services.AddInfrastructure();
+
+if (development)
 {
-    var builder = WebApplication.CreateBuilder(args);
-    var development = builder.Environment.IsDevelopment();
-
-    if (!development)
-        builder.AddCloudHostedServices();
-
-    builder
-        .AddLogging()
-        .AddDatabase()
-        .AddIdentity()
-        .AddIdentityServer()
-        .AddAspNetEndpoints();
-
-    builder.Services.AddInfrastructure();
-
-    if (development)
-    {
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-        await SeedData.Initialize(builder.Services.BuildServiceProvider());   
-    }
-
-    var app = builder.Build();
-
-    app.ConfigurePipeline();
-
-    app.Run();
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 }
-catch (Exception exc)
-{
-    Log.Fatal(exc, "Unable to start identity server");
-}
-finally
-{
-    Log.Information("Identity server termimnated");
-    Log.CloseAndFlush();
-}
+
+await SeedData.Initialize(builder.Services.BuildServiceProvider());
+
+var app = builder.Build();
+
+app.ConfigurePipeline();
+
+app.Run();

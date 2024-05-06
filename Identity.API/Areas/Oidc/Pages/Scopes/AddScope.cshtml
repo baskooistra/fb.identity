@@ -1,0 +1,35 @@
+﻿@page
+@model AddScope
+
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Add API Scope";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <div class="row">
+        <form id="client" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Name" class="form-control" autocomplete="name" aria-required="true" placeholder="name" />
+                <label asp-for="Input.Name" class="form-label">Name</label>
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.DisplayName" class="form-control" autocomplete="display name" aria-required="true" placeholder="display name" />
+                <label asp-for="Input.DisplayName" class="form-label">Display name</label>
+                <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+            </div>
+            <div class="checkbox mb-3">
+                <label asp-for="Input.Enabled" class="form-label">
+                    <input class="form-check-input" asp-for="Input.Enabled" />
+                    @Html.DisplayNameFor(m => m.Input.Enabled)
+                </label>
+            </div>
+            <div class="form-floating mb-3">
+                <button id="scope-submit" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

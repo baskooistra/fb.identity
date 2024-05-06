@@ -18,7 +18,7 @@ public class OidcClientsRepository(
 
     async Task<Client?> IOidcClientsService.FindClient(string clientId, CancellationToken cancellationToken)
     {
-        var clientEntity = await context.Clients.FindAsync([clientId], cancellationToken: cancellationToken);
+        var clientEntity = await context.Clients.SingleOrDefaultAsync(x => x.ClientId == clientId, cancellationToken: cancellationToken);
         return clientEntity?.ToModel();
     }
 
@@ -31,10 +31,9 @@ public class OidcClientsRepository(
 
     async Task<Client> IOidcClientsService.UpdateClient(Client client, CancellationToken cancellationToken)
     {
-        var clientEntity = await context.Clients.FindAsync([client.ClientId], cancellationToken: cancellationToken);
-        if (clientEntity == null)
-            throw new KeyNotFoundException("No client found matching client id");
-
+        var clientEntity = await context.Clients.SingleOrDefaultAsync(x => x.ClientId == client.ClientId, cancellationToken: cancellationToken) 
+            ?? throw new KeyNotFoundException("No client found matching client id");
+        
         var updateEntity = client.ToEntity();
         clientEntity.ClientName = updateEntity.ClientName;
         clientEntity.Description = updateEntity.Description;
@@ -53,10 +52,9 @@ public class OidcClientsRepository(
 
     async Task IOidcClientsService.DeleteClient(string clientId, CancellationToken cancellationToken)
     {
-        var clientEntity = await context.Clients.FindAsync([clientId], cancellationToken: cancellationToken);
-        if (clientEntity == null)
-            throw new KeyNotFoundException("No client found matching client id");
-        
+        var clientEntity = await context.Clients.SingleOrDefaultAsync(x => x.ClientId == clientId, cancellationToken: cancellationToken)
+            ?? throw new KeyNotFoundException("No client found matching client id");
+
         context.Entry(clientEntity).State = EntityState.Deleted;
         await context.SaveChangesAsync(cancellationToken);
     }

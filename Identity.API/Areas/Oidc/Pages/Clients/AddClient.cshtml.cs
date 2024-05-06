@@ -1,8 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿#nullable disable
+
+using System.ComponentModel.DataAnnotations;
 using Duende.IdentityServer.Models;
 using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Identity.API.Areas.Oidc.Pages.Clients;
 
@@ -22,7 +25,7 @@ public class AddClient(IOidcClientsService oidcClientsService) : PageModel
         [Required(ErrorMessage = "This field is mandatory")]
         public required string ClientId { get; set; }
         
-        public string? ClientSecret { get; set; }
+        public string ClientSecret { get; set; }
         
         public ClientType Type { get; set; }
         
@@ -42,13 +45,16 @@ public class AddClient(IOidcClientsService oidcClientsService) : PageModel
     
     [BindProperty]
     public ClientModel Input { get; set; }
-    
+
+    public SelectList Options { get; set; }
+
     public void OnGet()
     {
-        
+        var names = Enum.GetNames(typeof(ClientType)).ToList();
+        Options = new SelectList(names);
     }
 
-    public async Task OnPostAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         var secureClient = IsSecureClient(Input.Type);
         if (secureClient && string.IsNullOrWhiteSpace(Input.ClientSecret))
@@ -64,16 +70,22 @@ public class AddClient(IOidcClientsService oidcClientsService) : PageModel
                 ClientId = Input.ClientId,
                 AllowedGrantTypes = GetGrantTypes(Input.Type),
                 RequirePkce = !secureClient,
+                RequireClientSecret = secureClient,
                 AllowOfflineAccess = !secureClient,
-                RedirectUris = new[] { Input.RedirectUri },
-                PostLogoutRedirectUris = new[] { Input.PostLogoutRedirectUri }
+                RedirectUris = [Input.RedirectUri],
+                PostLogoutRedirectUris = [Input.PostLogoutRedirectUri],
+                AllowedScopes = ["openid", "profile"]
             };
 
             if (secureClient)
-                client.ClientSecrets = new[] { new Secret(Input.ClientSecret!) };
+                client.ClientSecrets = [new Secret(Input.ClientSecret!)];
                 
             await oidcClientsService.AddClient(client, cancellationToken);
+
+            return RedirectToPage("oidc/clients");
         }
+
+        return Page();
     }
 
     private static string[] GetGrantTypes(ClientType clientType)

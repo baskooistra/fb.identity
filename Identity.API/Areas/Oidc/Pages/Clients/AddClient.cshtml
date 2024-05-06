@@ -2,7 +2,7 @@
 @model AddClient
 
 @{
-    Layout = "Shared/_Layout";
+    Layout = "/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Add OIDC Client";
 }
 
@@ -11,11 +11,6 @@
     <div class="row">
         <form id="client" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Enabled" class="form-control" />
-                <label asp-for="Input.Enabled" class="form-label">Enabled</label>
-                <span asp-validation-for="Input.Enabled" class="text-danger"></span>
-            </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ClientId" class="form-control" autocomplete="clientId" aria-required="true" placeholder="client id" />
                 <label asp-for="Input.ClientId" class="form-label">Client Id</label>
@@ -27,8 +22,9 @@
                 <span asp-validation-for="Input.ClientSecret" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Type" class="form-control" autocomplete="type" aria-required="true" placeholder="client type" />
-                <label asp-for="Input.Type" class="form-label">Client type</label>
+                <select asp-for="Input.Type" aria-required="true" asp-items="Model.Options" class="w-100">
+                    <option value="">Select client type</option>
+                </select>
                 <span asp-validation-for="Input.Type" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
@@ -51,8 +47,14 @@
                 <label asp-for="Input.PostLogoutRedirectUri" class="form-label">Post logout redirect uri</label>
                 <span asp-validation-for="Input.PostLogoutRedirectUri" class="text-danger"></span>
             </div>
-            <div>
-                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            <div class="checkbox mb-3">
+                <label asp-for="Input.Enabled" class="form-label">
+                    <input class="form-check-input" asp-for="Input.Enabled" />
+                    @Html.DisplayNameFor(m => m.Input.Enabled)
+                </label>
+            </div>
+            <div class="form-floating mb-3">
+                <button id="client-submit" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
             </div>
         </form>
     </div>
