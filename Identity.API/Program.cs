@@ -25,7 +25,7 @@ if (development)
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 }
 
-await SeedData.Initialize(builder.Services.BuildServiceProvider());
+await SeedData.Initialize(builder.Services.BuildServiceProvider(), builder.Environment.IsDevelopment());
 
 var app = builder.Build();
 
