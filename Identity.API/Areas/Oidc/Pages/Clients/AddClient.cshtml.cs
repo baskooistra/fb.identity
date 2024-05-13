@@ -74,7 +74,7 @@ public class AddClient(IOidcClientsService oidcClientsService) : PageModel
                 AllowOfflineAccess = !secureClient,
                 RedirectUris = [Input.RedirectUri],
                 PostLogoutRedirectUris = [Input.PostLogoutRedirectUri],
-                AllowedScopes = ["openid", "profile"]
+                AllowedScopes = ["openid", "profile", "email"]
             };
 
             if (secureClient)
