@@ -11,6 +11,16 @@ services:
       - ./data:/var/opt/mssql/data
       - ./log:/var/opt/mssql/log
       - ./secrets:/var/opt/mssql/secrets
+  eventgrid:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AEGS_Topics__0__name=users
+      - AEGS_Topics__0__port=7001
+      - AEGS_Topics__0__key=AzureEventGridSasKey
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/aegs/AzureEventGrid.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=Y0urSup3rCrypt1cPa55w0rd!
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/aegs:ro
   identity.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

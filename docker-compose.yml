@@ -3,6 +3,8 @@ version: '3.4'
 services:
   identity.sql:
     image: mcr.microsoft.com/mssql/server:2022-latest
+  eventgrid:
+    image: pmcilreavy/azureeventgridsimulator
   identity.api:
     image: ${DOCKER_REGISTRY-}identityapi
     build:
@@ -10,3 +12,4 @@ services:
       dockerfile: Identity.API/Dockerfile
     depends_on: 
       - identity.sql
+      - eventgrid

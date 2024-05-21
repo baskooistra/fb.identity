@@ -18,7 +18,7 @@ builder
     .AddAspNetEndpoints()
     .AddCors();
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 if (development)
 {

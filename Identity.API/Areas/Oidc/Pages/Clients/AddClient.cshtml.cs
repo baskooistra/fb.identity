@@ -32,7 +32,7 @@ public class AddClient(IOidcClientsService oidcClientsService) : PageModel
         [Required(ErrorMessage = "This field is mandatory")]
         public required string ClientName { get; set; }
         
-        public string? Description { get; set; }
+        public string Description { get; set; }
         
         [Required(ErrorMessage = "This field is mandatory")]
         [Url(ErrorMessage = "Redirect uri must be a valid url")]
