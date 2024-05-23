@@ -2,6 +2,7 @@
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
+using Identity.API.Constants;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -33,7 +34,7 @@ namespace Identity.API.SeedData
                 await persistedGrantContext.Database.MigrateAsync();
             }
 
-            string[] roles = ["Owner", "User"];
+            string[] roles = [Roles.Owner, Roles.User];
 
             foreach (string roleName in roles)
             {

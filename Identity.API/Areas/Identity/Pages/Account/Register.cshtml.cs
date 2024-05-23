@@ -5,6 +5,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
+using Identity.API.Constants;
 using Identity.Domain.Interfaces;
 using Identity.Domain.Models;
 using Microsoft.AspNetCore.Authentication;
@@ -138,6 +139,8 @@ namespace Identity.API.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddToRoleAsync(user, Roles.User);
 
                     await _eventConnector.SendUserCreatedEvent(user, cancellationToken);
 

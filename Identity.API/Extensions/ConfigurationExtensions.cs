@@ -1,5 +1,6 @@
 ﻿using Azure.Identity;
 using CommunityToolkit.Diagnostics;
+using Identity.API.Constants;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -86,9 +87,15 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder AddAspNetEndpoints(this WebApplicationBuilder builder)
     {
-        builder.Services.AddRazorPages(options =>
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthorizationPolicies.Owner, policy =>
+                policy.RequireRole(Roles.Owner));
+        })
+        .AddRazorPages(options =>
         {
             options.Conventions.AuthorizeAreaFolder("oidc", "/");
+            options.Conventions.AuthorizeAreaPage("identity", "/users", AuthorizationPolicies.Owner);
         });
 
         return builder;
