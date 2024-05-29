@@ -1,10 +1,13 @@
-﻿using Azure.Identity;
+﻿using AspNetCore.Authentication.ApiKey;
+using Azure.Identity;
 using CommunityToolkit.Diagnostics;
+using Identity.API.Authentication;
 using Identity.API.Constants;
 using Identity.Domain.Models;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
@@ -87,16 +90,26 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder AddAspNetEndpoints(this WebApplicationBuilder builder)
     {
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy(AuthorizationPolicies.Owner, policy =>
+        builder.Services.Configure<AuthenticationConfiguration>(builder.Configuration.GetSection(nameof(AuthenticationConfiguration)));
+
+        builder.Services.AddAuthentication()
+            .AddApiKeyInHeader<ApiKeyProvider>(options =>
+            {
+                options.Realm = "Azure functions";
+                options.KeyName = "x-api-key";
+            });
+
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(AuthorizationPolicies.Owner, policy =>
                 policy.RequireRole(Roles.Owner));
-        })
-        .AddRazorPages(options =>
+
+        builder.Services.AddRazorPages(options =>
         {
             options.Conventions.AuthorizeAreaFolder("oidc", "/");
             options.Conventions.AuthorizeAreaPage("identity", "/users", AuthorizationPolicies.Owner);
         });
+
+        builder.Services.AddControllers();
 
         return builder;
     }

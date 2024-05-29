@@ -25,6 +25,7 @@ public static class ApplicationExtensions
             .UseIdentityServer()
             .UseAuthorization();
             
+        app.MapControllers();
         app.MapRazorPages();
 
         return app;
